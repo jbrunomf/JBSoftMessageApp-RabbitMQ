@@ -23,6 +23,6 @@ namespace Core
 
 
         public override string ToString()
-            => $"Pedido Id: {Id}, Usuário? {Usuario.Nome}, Data de Criação: {DataCriacao:dd/MM/yyyy}";
+            => $"Pedido Id: {Id}, Usuário: {Usuario.Nome}, Data de Criação: {DataCriacao:dd/MM/yyyy}";
     }
 }

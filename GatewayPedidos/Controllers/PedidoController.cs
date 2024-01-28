@@ -30,30 +30,27 @@ namespace GatewayPedidos.Controllers
 
             using (var connection = factory.CreateConnection())
             {
-                using (var channel = connection.CreateModel())
+                using var channel = connection.CreateModel();
+                channel.QueueDeclare(
+                    queue: "fila",
+                    durable: false,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
+
+                var message = JsonSerializer.Serialize(new Pedido
                 {
-                    channel.QueueDeclare(
-                        queue: "fila",
-                        durable: false,
-                        exclusive: false,
-                        autoDelete: false,
-                        arguments: null);
+                    Id = Guid.NewGuid(),
+                    Usuario = new Usuario(Guid.NewGuid(), "Teste", "jbrunomf@outlook.com")
+                });
 
-                    var message = JsonSerializer.Serialize(new Pedido
-                    {
-                        Id = Guid.NewGuid(),
-                        Usuario = new Usuario(Guid.NewGuid(), "Teste", "jbrunomf@outlook.com")
-                    });
+                var body = Encoding.UTF8.GetBytes(message);
 
-                    var body = Encoding.UTF8.GetBytes(message);
-
-                    channel.BasicPublish(exchange: "",
-                        routingKey: "fila",
-                        basicProperties: null,
-                        body: body);
-                }
+                channel.BasicPublish(exchange: "",
+                    routingKey: "fila",
+                    basicProperties: null,
+                    body: body);
             }
-
             return Ok();
         }
     }
